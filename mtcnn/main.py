@@ -60,8 +60,8 @@ def main():
         torch.cuda.manual_seed(args.seed)
 
     train_data = Deidentified(
-        data_path=args.data_dir+'/data/train',
-        label_path=args.data_dir+'/labels/train'
+        data_path=args.data_dir + '/data/train',
+        label_path=args.data_dir + '/labels/train'
     )
 
     test_data = Deidentified(
