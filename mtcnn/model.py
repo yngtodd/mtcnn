@@ -1,4 +1,3 @@
-"""MTCNN Model"""
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -44,4 +43,4 @@ class MTCNN(nn.Module):
         self.subsite_size = subsite_size
         self.laterality_size = laterality_size
         self.behavior_size = behavior_size
-        self.grade_size = grade_siz:
+        self.grade_size = grade_size:
