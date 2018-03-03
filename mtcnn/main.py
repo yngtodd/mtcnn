@@ -3,11 +3,10 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
-import numpy as np
-from parser import parse_args
-
 from data import Deidentified
 from model import MTCNN
+
+from parser import parse_args
 
 
 def train(epoch, train_loader, model, optimizer, args):
@@ -71,8 +70,12 @@ def main():
 
     train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True)
     test_loader = DataLoader(test_data, batch_size=args.batch_size, shuffle=False)
+    wv_matrix = load_wv_matrix(args.data_dir + '/wv_matrix/wv_matrix.npy')
 
     model = MTCNN()
+    if args.cuda and torch.cuda.device_count() > 1:
+        model = nn.DataParallel(model)
+        model.cuda()
 
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 

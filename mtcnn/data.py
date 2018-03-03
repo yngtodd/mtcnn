@@ -47,3 +47,16 @@ class Deidentified(Dataset):
             sample = self.transform(sample)
             
         return sample
+
+
+def load_wv_matrix(wv_path):
+    """
+    Load word vectors.
+
+    Parameters:
+    ----------
+    * `wv_path` [str]
+        Path to word vectors.
+    """
+    return np.load(wv_path)
+
