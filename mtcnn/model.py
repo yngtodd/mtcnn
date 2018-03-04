@@ -5,7 +5,7 @@ import torch.nn as nn
 class MTCNN(nn.Module):
     def __init__(self, wv_matrix, kernel1=3, kernel2=4, kernel3=5, num_filters1=100,
                  num_filters2=100, num_filters3=100, dropout1=0.5, dropout2=0.5, dropout3=0.5,
-                 max_sent_len=1500, word_dim=30, vocab_size=2881, subsite_size=8,
+                 max_sent_len=1500, word_dim=300, vocab_size=2881, subsite_size=8,
                  laterality_size=2, behavior_size=2, grade_size=4, alt_model_type=None):
         super(MTCNN, self).__init__()
         """
@@ -74,7 +74,7 @@ class MTCNN(nn.Module):
         self._sum_filters()
 
         self.embedding = nn.Embedding(self.vocab_size + 2, self.word_dim, padding_idx=0)
-#        self.embedding.weight.data.copy_(torch.from_numpy(self.wv_matrix))
+        self.embedding.weight.data.copy_(torch.from_numpy(self.wv_matrix))
 
         if self.alt_model_type == 'static':
             self.embedding.weight.requires_grad = False
@@ -108,26 +108,26 @@ class MTCNN(nn.Module):
         self.fc1 = nn.Linear(self._filter_sum, self.subsite_size)
         self.fc2 = nn.Linear(self._filter_sum, self.laterality_size)
         self.fc3 = nn.Linear(self._filter_sum, self.behavior_size)
-        self.fc4 = nn.Linear(self._filter_sum, self.self.grade_size)
+        self.fc4 = nn.Linear(self._filter_sum, self.grade_size)
 
-        def _sum_filters(self):
-            """Get the total number of convolutional filters."""
-            self._filter_sum = self.num_filters1 + self.num_filters2 + self.num_filters3
+    def _sum_filters(self):
+        """Get the total number of convolutional filters."""
+        self._filter_sum = self.num_filters1 + self.num_filters2 + self.num_filters3
 
-        def forward(self, x):
-            x = self.embedding().view(-1, 1, self.word_dim * self.max_sent_len)
-            if self.alt_model_type == "multichannel":
-                x2 = self.embedding2(x).view(-1, 1, self.word_dim * self.max_sent_len)
-                x = torch.cat((x, x2), 1)
+    def forward(self, x):
+        x = self.embedding().view(-1, 1, self.word_dim * self.max_sent_len)
+        if self.alt_model_type == "multichannel":
+            x2 = self.embedding2(x).view(-1, 1, self.word_dim * self.max_sent_len)
+            x = torch.cat((x, x2), 1)
 
-            conv_results = []
-            conv_results.append(self.convblock1(x).view(-1, self.num_filters1))
-            conv_results.append(self.convblock2(x).view(-1, self.num_filters2))
-            conv_results.append(self.convblock3(x).view(-1, self.num_filters3))
-            x = torch.cat(conv_results, 1)
+        conv_results = []
+        conv_results.append(self.convblock1(x).view(-1, self.num_filters1))
+        conv_results.append(self.convblock2(x).view(-1, self.num_filters2))
+        conv_results.append(self.convblock3(x).view(-1, self.num_filters3))
+        x = torch.cat(conv_results, 1)
 
-            out_subsite = self.fc1(x)
-            out_laterality = self.fc2(x)
-            out_behavior = self.fc3(x)
-            out_grade = self.fc4(x)
-            return out_subsite, out_laterality, out_behavior, out_grade
+        out_subsite = self.fc1(x)
+        out_laterality = self.fc2(x)
+        out_behavior = self.fc3(x)
+        out_grade = self.fc4(x)
+        return out_subsite, out_laterality, out_behavior, out_grade
