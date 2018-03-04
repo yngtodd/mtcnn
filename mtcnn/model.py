@@ -71,6 +71,7 @@ class MTCNN(nn.Module):
         self.grade_size = grade_size
         self.alt_model_type = alt_model_type
         self._filter_sum = None
+        self._sum_filters()
 
         self.embedding = nn.Embedding(self.vocab_size + 2, self.word_dim, padding_idx=0)
 #        self.embedding.weight.data.copy_(torch.from_numpy(self.wv_matrix))
@@ -115,7 +116,7 @@ class MTCNN(nn.Module):
 
         def forward(self, x):
             x = self.embedding().view(-1, 1, self.word_dim * self.max_sent_len)
-            if self.model_type == "multichannel":
+            if self.alt_model_type == "multichannel":
                 x2 = self.embedding2(x).view(-1, 1, self.word_dim * self.max_sent_len)
                 x = torch.cat((x, x2), 1)
 
