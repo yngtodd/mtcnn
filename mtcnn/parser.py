@@ -13,6 +13,8 @@ def parse_args():
     parser = argparse.ArgumentParser(description='MTCNN')
     parser.add_argument('--data_dir', type=str, default='/Users/youngtodd/data/deidentified',
                         help='Root directory for the data')
+    parser.add_argument('--batch_size', type=int, default=16,
+                        help='Batch size for training [default=16]')
     parser.add_argument('--num_epochs', type=int, default=50,
                         help='Number of epochs to be run [default 50]')
     parser.add_argument('--lr', type=float, default=0.01,

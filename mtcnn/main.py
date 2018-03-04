@@ -3,9 +3,11 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
-from data import Deidentified
 from model import MTCNN
+from data import Deidentified
+from data import load_wv_matrix
 
+import numpy as np
 from parser import parse_args
 
 
@@ -32,6 +34,11 @@ def train(epoch, train_loader, model, optimizer, args):
     """
     model.train()
     for batch_idx, sample in enumerate(train_loader):
+        sentence = sample['sentence']
+        subsite = sample['subsite']
+        laterality = sample['laterality']
+        behavior = sample['behavior']
+        grade = sample['grade']
 
 
 
@@ -51,7 +58,9 @@ def test(test_loader, model, args):
 
 
 def main():
+    print('parsing args')
     args = parse_args()
+    print(args)
     args.cuda = not args.no_cuda and torch.cuda.is_available()
 
     torch.manual_seed(args.seed)
@@ -72,7 +81,7 @@ def main():
     test_loader = DataLoader(test_data, batch_size=args.batch_size, shuffle=False)
     wv_matrix = load_wv_matrix(args.data_dir + '/wv_matrix/wv_matrix.npy')
 
-    model = MTCNN()
+    model = MTCNN(wv_matrix)
     if args.cuda and torch.cuda.device_count() > 1:
         model = nn.DataParallel(model)
         model.cuda()
@@ -82,3 +91,7 @@ def main():
     for epoch in range(1, args.num_epochs + 1):
             train(epoch, train_loader, model, optimizer, args)
             test(test_loader, model, args)
+
+
+if __name__=='__main__':
+    main()
