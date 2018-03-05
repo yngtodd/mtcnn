@@ -48,7 +48,3 @@ def print_accuracy(epoch, subsite_correct, laterality_correct,
     grade = 100 * grade_correct / total
     print('Epoch {:d} Accuracy:\n  Subsite: {:.2f}\n  Laterality: {:.2f}\n' \
           '  Behavior: {:.2f}\n  Grade: {:.2f}\n'.format(epoch, subsite, laterality, behavior, grade))
-
-    
-
-
