@@ -11,7 +11,7 @@ from data import load_wv_matrix
 from parser import parse_args
 
 
-def train(epoch, train_loader, model, optimizer, criterion, args):
+def train(epoch, train_loader, optimizer, criterion, args):
     """
     Train the model.
 
@@ -35,6 +35,7 @@ def train(epoch, train_loader, model, optimizer, criterion, args):
     * `args`: [argparse object]
         Parsed arguments.
     """
+    print(model)
     model.train()
     for batch_idx, sample in enumerate(train_loader):
         sentence = sample['sentence']
@@ -77,9 +78,7 @@ def test(test_loader, model, args):
 
 
 def main():
-    print('parsing args')
     args = parse_args()
-    print(args)
     args.cuda = not args.no_cuda and torch.cuda.is_available()
 
     torch.manual_seed(args.seed)
@@ -99,7 +98,8 @@ def main():
     train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True)
     test_loader = DataLoader(test_data, batch_size=args.batch_size, shuffle=False)
     wv_matrix = load_wv_matrix(args.data_dir + '/wv_matrix/wv_matrix.npy')
-
+    
+    global model
     model = MTCNN(wv_matrix)
     if args.cuda and torch.cuda.device_count() > 1:
         model = nn.DataParallel(model)
@@ -109,8 +109,8 @@ def main():
     criterion = nn.CrossEntropyLoss()
 
     for epoch in range(1, args.num_epochs + 1):
-            train(epoch, train_loader, model, optimizer, criterion, args)
-            test(test_loader, model, args)
+            train(epoch, train_loader, optimizer, criterion, args)
+            test(test_loader, args)
 
 
 if __name__=='__main__':

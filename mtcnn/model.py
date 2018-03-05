@@ -115,7 +115,7 @@ class MTCNN(nn.Module):
         self._filter_sum = self.num_filters1 + self.num_filters2 + self.num_filters3
 
     def forward(self, x):
-        x = self.embedding().view(-1, 1, self.word_dim * self.max_sent_len)
+        x = self.embedding(x).view(-1, 1, self.word_dim * self.max_sent_len)
         if self.alt_model_type == "multichannel":
             x2 = self.embedding2(x).view(-1, 1, self.word_dim * self.max_sent_len)
             x = torch.cat((x, x2), 1)
