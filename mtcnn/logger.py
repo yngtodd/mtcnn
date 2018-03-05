@@ -1,4 +1,4 @@
-def print_progress(epoch, loss, batch_size, train_size):
+def print_progress(epoch, batch_idx, batch_size, train_size, loss):
     """
     Print the learning progress.
 
@@ -17,5 +17,7 @@ def print_progress(epoch, loss, batch_size, train_size):
         Size of the training set.
     """
     print('Epoch: {:d}, Step: [{:d}/{:d}], Loss: {:.4f}' \
-          .format(epoch, batch_size, train_size, loss))
+          .format(epoch, batch_idx * batch_size, train_size, loss))
 
+
+def print_accuracy():

@@ -47,6 +47,19 @@ def train(epoch, train_loader, optimizer, criterion, train_size, args):
         behavior = sample['behavior']
         grade = sample['grade']
 
+        if args.cuda:
+            sentence = sentence.cuda()
+            subsite = subsite.cuda()
+            laterality = laterality.cuda()
+            behavior = behavior.cuda()
+            grade = grade.cuda()
+            if args.half_precision:
+                sentence = sentence.half()
+                subsite = subsite.half()
+                laterality = laterality.half()
+                behavior = behavior.half()
+                grade = grade.half()
+
         sentence = Variable(sentence)
         subsite = Variable(subsite)
         laterality = Variable(laterality)
@@ -64,17 +77,14 @@ def train(epoch, train_loader, optimizer, criterion, train_size, args):
         optimizer.step()
 
         if batch_idx % args.log_interval == 0:
-            print_progress(epoch, loss.data[0], args.batch_size, train_size)
+            print_progress(epoch, batch_idx, args.batch_size, train_size, loss.data[0])
 
-def test(test_loader, model, args):
+def test(test_loader, args):
     """
     Test the model.
 
     * `test_loader`: [torch.utils.data.Dataloader]
         Data loader for the test set.
-
-    * `model`: [Pytorch model class]
-        Instantiated model.
 
     * `args`: [argparse object]
         Parsed arguments.
