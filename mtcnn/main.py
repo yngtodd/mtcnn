@@ -1,17 +1,17 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch.autograd import Variable
 from torch.utils.data import DataLoader
 
 from model import MTCNN
 from data import Deidentified
 from data import load_wv_matrix
 
-import numpy as np
 from parser import parse_args
 
 
-def train(epoch, train_loader, model, optimizer, args):
+def train(epoch, train_loader, model, optimizer, criterion, args):
     """
     Train the model.
 
@@ -29,6 +29,9 @@ def train(epoch, train_loader, model, optimizer, args):
     * `optimizer`: [torch.optim optimizer]
         Optimizer for learning the model.
 
+    * `criterion`: [torch loss function]
+        Loss function to measure learning.
+
     * `args`: [argparse object]
         Parsed arguments.
     """
@@ -40,7 +43,23 @@ def train(epoch, train_loader, model, optimizer, args):
         behavior = sample['behavior']
         grade = sample['grade']
 
+        sentence = Variable(sentence)
+        subsite = Variable(subsite)
+        laterality = Variable(laterality)
+        behavior = Variable(behavior)
+        grade = Variable(grade)
+#        print('sentence is of type {} and shape {}'.format(type(sentence), sentence.size()))
 
+        optimizer.zero_grad()
+        out_subsite, out_laterality, out_behavior, out_grade = model(sentence)
+
+        loss_subsite = criterion(out_subsite, subsite)
+        loss_laterality = criterion(out_laterality, laterality)
+        loss_behavior = criterion(out_behavior, behavior)
+        loss_grade = criterion(out_grade, grade)
+        loss = loss_subsite + loss_laterality + loss_behavior + loss_grade
+        loss.backward()
+        optimizer.step()
 
 def test(test_loader, model, args):
     """
@@ -87,9 +106,10 @@ def main():
         model.cuda()
 
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
+    criterion = nn.CrossEntropyLoss()
 
     for epoch in range(1, args.num_epochs + 1):
-            train(epoch, train_loader, model, optimizer, args)
+            train(epoch, train_loader, model, optimizer, criterion, args)
             test(test_loader, model, args)
 
 
