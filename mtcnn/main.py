@@ -10,6 +10,7 @@ from data import load_wv_matrix
 
 from parser import parse_args
 from logger import print_progress
+from logger import print_accuracy
 
 
 def train(epoch, train_loader, optimizer, criterion, train_size, args):
@@ -80,9 +81,14 @@ def train(epoch, train_loader, optimizer, criterion, train_size, args):
             print_progress(epoch, batch_idx, args.batch_size, train_size, loss.data[0])
 
 
-def test(test_loader, args):
+def test(epoch, test_loader, args):
     """
     Test the model.
+ 
+    Parameters:
+    ----------
+    * `epoch`: [int]
+        Epoch number.
 
     * `test_loader`: [torch.utils.data.Dataloader]
         Data loader for the test set.
