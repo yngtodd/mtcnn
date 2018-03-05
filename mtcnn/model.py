@@ -116,7 +116,6 @@ class MTCNN(nn.Module):
 
     def forward(self, x):
         x = self.embedding(x).view(-1, 1, self.word_dim * self.max_sent_len)
-#        print("embedding output: {}".format(x.size()))
         if self.alt_model_type == "multichannel":
             x2 = self.embedding2(x).view(-1, 1, self.word_dim * self.max_sent_len)
             x = torch.cat((x, x2), 1)
@@ -126,14 +125,9 @@ class MTCNN(nn.Module):
         conv_results.append(self.convblock2(x).view(-1, self.num_filters2))
         conv_results.append(self.convblock3(x).view(-1, self.num_filters3))
         x = torch.cat(conv_results, 1)
-#        print("output of concatenated convolutions: {}".format(x.size()))
 
         out_subsite = self.fc1(x)
-#        print('subsite out: {}'.format(out_subsite.size()))
         out_laterality = self.fc2(x)
-#        print('laterality out: {}'.format(out_laterality.size()))
         out_behavior = self.fc3(x)
-#        print('behavior out: {}'.format(out_behavior.size()))
         out_grade = self.fc4(x)
-#        print('grade out: {}'.format(out_grade.size()))
         return out_subsite, out_laterality, out_behavior, out_grade
