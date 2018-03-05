@@ -79,6 +79,7 @@ def train(epoch, train_loader, optimizer, criterion, train_size, args):
         if batch_idx % args.log_interval == 0:
             print_progress(epoch, batch_idx, args.batch_size, train_size, loss.data[0])
 
+
 def test(test_loader, args):
     """
     Test the model.
@@ -89,6 +90,50 @@ def test(test_loader, args):
     * `args`: [argparse object]
         Parsed arguments.
     """
+    model.eval()
+
+    subsite_correct = 0
+    laterality_correct = 0
+    behavior_correct = 0
+    grade_correct = 0
+    total = 0
+
+    for _, sample in enumerate(test_loader):
+        sentence = sample['sentence']
+        subsite = sample['subsite']
+        laterality = sample['laterality']
+        behavior = sample['behavior']
+        grade = sample['grade']
+
+        if args.cuda:
+            sentence = sentence.cuda()
+            subsite = subsite.cuda()
+            laterality = laterality.cuda()
+            behavior = behavior.cuda()
+            grade = grade.cuda()
+
+        sentence = Variable(sentence)
+        subsite = Variable(subsite)
+        laterality = Variable(laterality)
+        behavior = Variable(behavior)
+        grade = Variable(grade)
+
+        out_subsite, out_laterality, out_behavior, out_grade = model(sentence)
+        _, subsite_predicted = torch.max(out_subsite.data, 1)
+        _, laterality_predicted = torch.max(out_laterality.data, 1)
+        _, behavior_predicted = torch.max(out_behavior.data, 1)
+        _, grade_predicted = torch.max(out_grade.data, 1)
+
+        total += subsite.size(0)
+        subsite_correct += (subsite_predicted == subsite).sum()
+        laterality_correct += (laterality_predicted == laterality).sum()
+        behavior_correct += (behavior_predicted == behavior).sum()
+        grade_correct += (grade_predicted == grade).sum()
+
+    print_accuracy(
+        subsite_correct, laterality_correct,
+        behavior_correct, grade_correct, total
+    )
 
 
 def main():
@@ -126,7 +171,7 @@ def main():
 
     for epoch in range(1, args.num_epochs + 1):
             train(epoch, train_loader, optimizer, criterion, train_size, args)
-            test(test_loader, args)
+            test(epoch, test_loader, args)
 
 
 if __name__=='__main__':
