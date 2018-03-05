@@ -17,7 +17,7 @@ def print_progress(epoch, batch_idx, batch_size, train_size, loss):
         Size of the training set.
     """
     print('Epoch: {:d}, Step: [{:d}/{:d}], Loss: {:.4f}' \
-          .format(epoch, batch_idx * batch_size, train_size, loss))
+          .format(epoch, (batch_idx + 1) * batch_size, train_size, loss))
 
 
 def print_accuracy(epoch, subsite_correct, laterality_correct, 
