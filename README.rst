@@ -2,7 +2,7 @@
 
     <embed>
         <p align="center">
-            <img width="300" src="https://github.com/yngtodd/mtcnn/img/mtcnn.png">
+            <img width="300" src="https://github.com/yngtodd/mtcnn/blob/master/img/mtcnn.png">
         </p>
     </embed>
 
