@@ -23,8 +23,10 @@ def parse_args():
                         help='SGD momentum [default: 0.5]')
     parser.add_argument('--no_cuda', action='store_true', default=False,
                         help='disables CUDA training')
-    parser.add_argument('--half_prec', default=False,
+    parser.add_argument('--half_prec', type=bool, default=False,
                         help='Whether to train with half precision [default: False]')
+    parser.add_argument('--log_interval', type=int, default=10,
+                        help='Interval at which to log progress. [default: 10]')
     parser.add_argument('--seed', type=int, default=1,
                         help='random seed [default: 1]')
     args = parser.parse_args()

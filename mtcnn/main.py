@@ -9,9 +9,10 @@ from data import Deidentified
 from data import load_wv_matrix
 
 from parser import parse_args
+from logger import print_progress
 
 
-def train(epoch, train_loader, optimizer, criterion, args):
+def train(epoch, train_loader, optimizer, criterion, train_size, args):
     """
     Train the model.
 
@@ -32,10 +33,12 @@ def train(epoch, train_loader, optimizer, criterion, args):
     * `criterion`: [torch loss function]
         Loss function to measure learning.
 
+    * `train_size`: [int]
+        Size of the training set (for logging).
+
     * `args`: [argparse object]
         Parsed arguments.
     """
-    print(model)
     model.train()
     for batch_idx, sample in enumerate(train_loader):
         sentence = sample['sentence']
@@ -49,11 +52,9 @@ def train(epoch, train_loader, optimizer, criterion, args):
         laterality = Variable(laterality)
         behavior = Variable(behavior)
         grade = Variable(grade)
-#        print('sentence is of type {} and shape {}'.format(type(sentence), sentence.size()))
 
         optimizer.zero_grad()
         out_subsite, out_laterality, out_behavior, out_grade = model(sentence)
-
         loss_subsite = criterion(out_subsite, subsite)
         loss_laterality = criterion(out_laterality, laterality)
         loss_behavior = criterion(out_behavior, behavior)
@@ -61,6 +62,9 @@ def train(epoch, train_loader, optimizer, criterion, args):
         loss = loss_subsite + loss_laterality + loss_behavior + loss_grade
         loss.backward()
         optimizer.step()
+
+        if batch_idx % args.log_interval == 0:
+            print_progress(epoch, loss.data[0], args.batch_size, train_size)
 
 def test(test_loader, model, args):
     """
@@ -90,6 +94,8 @@ def main():
         label_path=args.data_dir + '/labels/train'
     )
 
+    train_size = len(train_data)
+
     test_data = Deidentified(
         data_path=args.data_dir + '/data/test',
         label_path=args.data_dir + '/labels/test'
@@ -109,7 +115,7 @@ def main():
     criterion = nn.CrossEntropyLoss()
 
     for epoch in range(1, args.num_epochs + 1):
-            train(epoch, train_loader, optimizer, criterion, args)
+            train(epoch, train_loader, optimizer, criterion, train_size, args)
             test(test_loader, args)
 
 
