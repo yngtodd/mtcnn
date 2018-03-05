@@ -88,21 +88,21 @@ class MTCNN(nn.Module):
             nn.Conv1d(1, self.num_filters1, self.kernel1),
             nn.ReLU(),
             nn.AdaptiveMaxPool1d(1),
-            nn.Dropout(p=self.dropout1)
+            #nn.Dropout(p=self.dropout1)
         )
 
         self.convblock2 = nn.Sequential(
             nn.Conv1d(1, self.num_filters2, self.kernel2),
             nn.ReLU(),
             nn.AdaptiveMaxPool1d(1),
-            nn.Dropout(p=self.dropout2)
+            #nn.Dropout(p=self.dropout2)
         )
 
         self.convblock3 = nn.Sequential(
             nn.Conv1d(1, self.num_filters3, self.kernel3),
             nn.ReLU(),
             nn.AdaptiveMaxPool1d(1),
-            nn.Dropout(p=self.dropout3)
+            #nn.Dropout(p=self.dropout3)
         )
 
         self.fc1 = nn.Linear(self._filter_sum, self.subsite_size)

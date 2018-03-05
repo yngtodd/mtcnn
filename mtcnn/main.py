@@ -130,13 +130,13 @@ def test(epoch, test_loader, args):
         _, grade_predicted = torch.max(out_grade.data, 1)
 
         total += subsite.size(0)
-        subsite_correct += (subsite_predicted == subsite).sum()
-        laterality_correct += (laterality_predicted == laterality).sum()
-        behavior_correct += (behavior_predicted == behavior).sum()
-        grade_correct += (grade_predicted == grade).sum()
+        subsite_correct += (subsite_predicted == subsite.data).sum()
+        laterality_correct += (laterality_predicted == laterality.data).sum()
+        behavior_correct += (behavior_predicted == behavior.data).sum()
+        grade_correct += (grade_predicted == grade.data).cpu().sum()
 
     print_accuracy(
-        subsite_correct, laterality_correct,
+        epoch, subsite_correct, laterality_correct,
         behavior_correct, grade_correct, total
     )
 
@@ -166,12 +166,13 @@ def main():
     wv_matrix = load_wv_matrix(args.data_dir + '/wv_matrix/wv_matrix.npy')
     
     global model
-    model = MTCNN(wv_matrix)
+    model = MTCNN(wv_matrix, kernel1=3, kernel2=4, kernel3=5)
     if args.cuda and torch.cuda.device_count() > 1:
         model = nn.DataParallel(model)
         model.cuda()
 
-    optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
+    #optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
+    optimizer = optim.Adadelta(model.parameters(), lr=0.1)
     criterion = nn.CrossEntropyLoss()
 
     for epoch in range(1, args.num_epochs + 1):
