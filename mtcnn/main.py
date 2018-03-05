@@ -97,7 +97,6 @@ def test(epoch, test_loader, args):
         Parsed arguments.
     """
     model.eval()
-
     subsite_correct = 0
     laterality_correct = 0
     behavior_correct = 0
