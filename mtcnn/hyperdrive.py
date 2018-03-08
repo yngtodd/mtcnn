@@ -9,7 +9,6 @@ from data import Deidentified
 from data import load_wv_matrix
 
 from parser import parse_args
-from logger import print_progress
 from logger import print_accuracy
 
 from hyperspace import hyperdrive
