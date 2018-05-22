@@ -4,7 +4,7 @@ from attention import Attention
 
 
 class MTCNN(nn.Module):
-    def __init__(self, wv_matrix, kernel1=3, kernel2=4, kernel3=5, num_filters1=100,
+    def __init__(self, kernel1=3, kernel2=4, kernel3=5, num_filters1=100,
                  num_filters2=100, num_filters3=100, dropout1=0.5, dropout2=0.5, dropout3=0.5,
                  max_sent_len=3000, word_dim=300, vocab_size=35095, subsite_size=34,
                  laterality_size=4, behavior_size=3, histology_size=44, grade_size=5, alt_model_type=None):
@@ -53,7 +53,6 @@ class MTCNN(nn.Module):
                 "static":
                 "multichannel":
         """
-        self.wv_matrix = wv_matrix
         self.kernel1 = kernel1
         self.kernel2 = kernel2
         self.kernel3 = kernel3
@@ -76,7 +75,6 @@ class MTCNN(nn.Module):
         self._sum_filters()
 
         self.embedding = nn.Embedding(self.vocab_size + 2, self.word_dim, padding_idx=0)
-        self.embedding.weight.data.copy_(torch.from_numpy(self.wv_matrix))
 
         if self.alt_model_type == 'static':
             self.embedding.weight.requires_grad = False
@@ -107,13 +105,13 @@ class MTCNN(nn.Module):
             #nn.Dropout(p=self.dropout3)
         )
 
-        self.attention = Attention(self._filter_sum)
+        #self.attention = Attention(self._filter_sum)
 
         self.fc1 = nn.Linear(self._filter_sum, self.subsite_size)
         self.fc2 = nn.Linear(self._filter_sum, self.laterality_size)
         self.fc3 = nn.Linear(self._filter_sum, self.behavior_size)
         self.fc4 = nn.Linear(self._filter_sum, self.histology_size)
-        self.fc4 = nn.Linear(self._filter_sum, self.grade_size)
+        self.fc5 = nn.Linear(self._filter_sum, self.grade_size)
 
     def _sum_filters(self):
         """Get the total number of convolutional filters."""
@@ -135,8 +133,8 @@ class MTCNN(nn.Module):
         conv_results.append(self.convblock2(x).view(-1, self.num_filters2))
         conv_results.append(self.convblock3(x).view(-1, self.num_filters3))
         x = torch.cat(conv_results, 1)
-        print('Tensor after convolution concat has shape {}'.format(x.size()))
-        x = self.attention(x)
+        #print('Tensor after convolution concat has shape {}'.format(x.size()))
+        #x = self.attention(x)
 
         out_subsite = self.fc1(x)
         out_laterality = self.fc2(x)

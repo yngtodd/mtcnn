@@ -66,7 +66,7 @@ def train(epoch, train_loader, optimizer, criterion, train_size, args):
         grade = Variable(grade)
 
         optimizer.zero_grad()
-        out_subsite, out_laterality, out_behavior, out_histology out_grade = model(sentence)
+        out_subsite, out_laterality, out_behavior, out_histology, out_grade = model(sentence)
         loss_subsite = criterion(out_subsite, subsite)
         loss_laterality = criterion(out_laterality, laterality)
         loss_behavior = criterion(out_behavior, behavior)
@@ -160,16 +160,15 @@ def main():
     train_size = len(train_data)
 
     test_data = LaSynthetic(
-        data_path=args.data_dir + '/data/test',
-        label_path=args.data_dir + '/labels/test'
+        data_path=args.data_dir + '/data/val',
+        label_path=args.data_dir + '/labels/val'
     )
 
     train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True)
     test_loader = DataLoader(test_data, batch_size=args.batch_size, shuffle=False)
-    wv_matrix = load_wv_matrix(args.data_dir + '/wv_matrix/wv_matrix.npy')
 
     global model
-    model = MTCNN(wv_matrix, kernel1=3, kernel2=4, kernel3=5)
+    model = MTCNN(kernel1=3, kernel2=4, kernel3=5)
     if args.cuda and torch.cuda.device_count() > 1:
         model = nn.DataParallel(model)
         model.cuda()
