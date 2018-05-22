@@ -123,10 +123,7 @@ class MTCNN(nn.Module):
             x2 = self.embedding2(x).view(-1, 1, self.word_dim * self.max_sent_len)
             x = torch.cat((x, x2), 1)
 
-        print('Tensor after the embedding has shape {}'.format(x.size()))
-
-        convolve1 = self.convblock1(x).view(-1, self.num_filters1)
-        print('Each convolution layer output has shape {}'.format(convolve1.size()))
+        #convolve1 = self.convblock1(x).view(-1, self.num_filters1)
 
         conv_results = []
         conv_results.append(self.convblock1(x).view(-1, self.num_filters1))

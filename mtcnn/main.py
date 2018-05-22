@@ -42,7 +42,6 @@ def train(epoch, train_loader, optimizer, criterion, train_size, args):
     """
     model.train()
     for batch_idx, sample in enumerate(train_loader):
-#        print('input data size: {}'.format(sample['sentence'].size()))
         sentence = sample['sentence']
         subsite = sample['subsite']
         laterality = sample['laterality']
