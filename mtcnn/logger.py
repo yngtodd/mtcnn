@@ -6,7 +6,7 @@ def print_progress(epoch, batch_idx, batch_size, train_size, loss):
     ----------
     * `epoch`: [int]
         Epoch number.
-    
+
     * `loss`: [float]
         Loss value.
 
@@ -20,7 +20,7 @@ def print_progress(epoch, batch_idx, batch_size, train_size, loss):
           .format(epoch, (batch_idx + 1) * batch_size, train_size, loss))
 
 
-def print_accuracy(epoch, subsite_correct, laterality_correct, 
+def print_accuracy(epoch, subsite_correct, laterality_correct,
                    behavior_correct, grade_correct, total):
     """
     Print the accuracy for each task.
@@ -45,6 +45,7 @@ def print_accuracy(epoch, subsite_correct, laterality_correct,
     subsite = 100 * subsite_correct / total
     laterality = 100 * laterality_correct / total
     behavior = 100 * behavior_correct / total
+    histology = 100 * histology_correct / total
     grade = 100 * grade_correct / total
     print('\nEpoch {:d} Test Accuracy:\nSubsite: {:.2f}\nLaterality: {:.2f}\n' \
-          'Behavior: {:.2f}\nGrade: {:.2f}\n'.format(epoch, subsite, laterality, behavior, grade))
+          'Behavior: {:.2f}\nGrade: {:.2f}\n'.format(epoch, subsite, laterality, behavior, histology, grade))

@@ -1,12 +1,13 @@
 import torch
 import torch.nn as nn
+from attention import Attention
 
 
 class MTCNN(nn.Module):
     def __init__(self, wv_matrix, kernel1=3, kernel2=4, kernel3=5, num_filters1=100,
                  num_filters2=100, num_filters3=100, dropout1=0.5, dropout2=0.5, dropout3=0.5,
-                 max_sent_len=1500, word_dim=300, vocab_size=2881, subsite_size=8,
-                 laterality_size=2, behavior_size=2, grade_size=4, alt_model_type=None):
+                 max_sent_len=3000, word_dim=300, vocab_size=35095, subsite_size=34,
+                 laterality_size=4, behavior_size=3, histology_size=44, grade_size=5, alt_model_type=None):
         super(MTCNN, self).__init__()
         """
         Multi-task CNN model for document classification.
@@ -68,6 +69,7 @@ class MTCNN(nn.Module):
         self.subsite_size = subsite_size
         self.laterality_size = laterality_size
         self.behavior_size = behavior_size
+        self.histology_size = histology_size
         self.grade_size = grade_size
         self.alt_model_type = alt_model_type
         self._filter_sum = None
@@ -105,9 +107,12 @@ class MTCNN(nn.Module):
             #nn.Dropout(p=self.dropout3)
         )
 
+        self.attention = Attention(self._filter_sum)
+
         self.fc1 = nn.Linear(self._filter_sum, self.subsite_size)
         self.fc2 = nn.Linear(self._filter_sum, self.laterality_size)
         self.fc3 = nn.Linear(self._filter_sum, self.behavior_size)
+        self.fc4 = nn.Linear(self._filter_sum, self.histology_size)
         self.fc4 = nn.Linear(self._filter_sum, self.grade_size)
 
     def _sum_filters(self):
@@ -120,14 +125,22 @@ class MTCNN(nn.Module):
             x2 = self.embedding2(x).view(-1, 1, self.word_dim * self.max_sent_len)
             x = torch.cat((x, x2), 1)
 
+        print('Tensor after the embedding has shape {}'.format(x.size()))
+
+        convolve1 = self.convblock1(x).view(-1, self.num_filters1)
+        print('Each convolution layer output has shape {}'.format(convolve1.size()))
+
         conv_results = []
         conv_results.append(self.convblock1(x).view(-1, self.num_filters1))
         conv_results.append(self.convblock2(x).view(-1, self.num_filters2))
         conv_results.append(self.convblock3(x).view(-1, self.num_filters3))
         x = torch.cat(conv_results, 1)
+        print('Tensor after convolution concat has shape {}'.format(x.size()))
+        x = self.attention(x)
 
         out_subsite = self.fc1(x)
         out_laterality = self.fc2(x)
         out_behavior = self.fc3(x)
-        out_grade = self.fc4(x)
-        return out_subsite, out_laterality, out_behavior, out_grade
+        out_histology = self.fc4(x)
+        out_grade = self.fc5(x)
+        return out_subsite, out_laterality, out_behavior, out_histology, out_grade

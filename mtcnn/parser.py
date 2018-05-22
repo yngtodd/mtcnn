@@ -11,7 +11,7 @@ def parse_args():
         Parsed arguments.
     """
     parser = argparse.ArgumentParser(description='MTCNN')
-    parser.add_argument('--data_dir', type=str, default='/home/ygx/data/deidentified',
+    parser.add_argument('--data_dir', type=str, default='/home/ygx/data/shortsynth',
                         help='Root directory for the data')
     parser.add_argument('--batch_size', type=int, default=16,
                         help='Batch size for training [default=16]')
@@ -27,7 +27,7 @@ def parse_args():
                         help='Whether to train with half precision [default: False]')
     parser.add_argument('--log_interval', type=int, default=10,
                         help='Interval at which to log progress. [default: 10]')
-    parser.add_argument('--results_dir', type=str, 
+    parser.add_argument('--results_dir', type=str,
                         help='Path to save hyperparameter optimization results')
     parser.add_argument('--seed', type=int, default=1,
                         help='random seed [default: 1]')
