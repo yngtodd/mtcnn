@@ -21,7 +21,7 @@ def print_progress(epoch, batch_idx, batch_size, train_size, loss):
 
 
 def print_accuracy(epoch, subsite_correct, laterality_correct,
-                   behavior_correct, grade_correct, total):
+                   behavior_correct, histology_correct, grade_correct, total):
     """
     Print the accuracy for each task.
 
