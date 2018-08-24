@@ -118,7 +118,9 @@ class MTCNN(nn.Module):
         self._filter_sum = self.num_filters1 + self.num_filters2 + self.num_filters3
 
     def forward(self, x):
+        print(f'input data has shape {x.size()}')
         x = self.embedding(x).view(-1, 1, self.word_dim * self.max_sent_len)
+        print(f'data from embedding to convolution 1d has shape {x.size()}')
         if self.alt_model_type == "multichannel":
             x2 = self.embedding2(x).view(-1, 1, self.word_dim * self.max_sent_len)
             x = torch.cat((x, x2), 1)
